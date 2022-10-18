@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 32
+
+    defaultConfig {
+        applicationId "org.ossreviewtoolkit.example.android"
+        minSdkVersion 31
+        targetSdkVersion 32
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions 'store', 'type'
+
+    productFlavors {
+        google {
+            dimension 'store'
+        }
+
+        amazon {
+            dimension 'store'
+        }
+
+        demo {
+            dimension 'type'
+        }
+
+        full {
+            dimension 'type'
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$kotlinx_datetime_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_reflect_version"
+    implementation "org.jetbrains.kotlin:kotlin-script-runtime:$kotlin_reflect_version"
+
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_livedata_ktx_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_livedata_ktx_version"
+    implementation "androidx.datastore:datastore-preferences:$datastore_version"
+
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$retrofit_serialization"
+    implementation "com.jakewharton.timber:timber:$timber_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+
+    // These dependencies in combination with the `android.useAndroidX=true` in the gradle.properties file
+    // seem to lead to ORT hanging at
+    // [DefaultDispatcher-worker-1] DEBUG org.gradle.tooling.GradleConnector - Connecting from tooling API consumer version 7.5.1
+    // (visible by calling the analyzer with the --debug flag)
+    // Either comment out the setting in the gradle.properties file or these three dependencies and ORT will run through
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+}
+
+configurations {
+    // Exclude the lint dependency to reduce the size of the dependency tree for testing, because this dependency has
+    // a lot of transitive dependencies and is not required to test the variant-aware dependency resolution.
+    lintClassPath.exclude module: 'lint-gradle'
+}
+
+logger.quiet("The current working directory is set to: " + System.properties['user.dir'])
